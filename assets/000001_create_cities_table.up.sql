@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS cities (
+   id serial PRIMARY KEY,
+   cityname VARCHAR (50) UNIQUE NOT NULL,
+   website VARCHAR (100) UNIQUE NOT NULL,
+   mayor VARCHAR (100) 
+);

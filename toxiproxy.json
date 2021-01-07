@@ -1,0 +1,8 @@
+[
+ {
+	"name": "web_dev_pgsql", 
+	"listen" : "[::]:32777",
+	"upstream" : "localhost:5342",
+	"enabled": true
+ }
+]
