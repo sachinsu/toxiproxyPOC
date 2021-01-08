@@ -106,7 +106,7 @@ func (s *Server) ListCities(w http.ResponseWriter, r *http.Request, _ httprouter
 // ListCitiesWithLatency route
 func (s *Server) ListCitiesWithLatency(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	queryValues := r.URL.Query()
-	delay := 100
+	delay := 1000
 
 	if len(queryValues.Get("delay")) > 0 {
 		delay, _ = strconv.Atoi(queryValues.Get("delay"))
