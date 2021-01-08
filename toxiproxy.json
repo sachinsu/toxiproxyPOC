@@ -1,8 +1,8 @@
 [
  {
-	"name": "web_dev_pgsql", 
-	"listen" : "[::]:32777",
-	"upstream" : "localhost:5342",
+	"name": "pgsql", 
+	"listen" : "[::]:6000",
+	"upstream" : "127.0.0.1:5432",
 	"enabled": true
  }
 ]

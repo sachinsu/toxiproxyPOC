@@ -1,6 +1,7 @@
 package setup
 
 import (
+	"errors"
 	"log"
 
 	"github.com/golang-migrate/migrate/v4"
@@ -19,11 +20,14 @@ func MigrateDBSchema(dbConn string, migrationsPath string) error {
 		dbConn)
 
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Error while initiating db Migration %v", err)
 		return err
 	}
-	if err := m.Up(); err != nil {
-		log.Fatal(err)
+
+	if err := m.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
+		log.Fatalf("Error during applying migrations %v", err)
 		return err
 	}
+
+	return nil
 }

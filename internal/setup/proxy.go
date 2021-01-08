@@ -5,28 +5,30 @@ import (
 )
 
 var toxiClient *toxiproxy.Client
-var proxies map[string]*toxiproxy.Proxy
 
 //ref: https://github.com/Shopify/toxiproxy/tree/master/client
 func init() {
-	var err error
 	toxiClient = toxiproxy.NewClient("localhost:8474")
-	proxies, err = toxiClient.Populate([]toxiproxy.Proxy{{
-		Name:     "pgsql",
-		Listen:   "localhost:32323",
-		Upstream: "localhost:5432",
-	}})
+}
+
+// AddPGProxy for postgresql
+func AddPGProxy(listen string, upstream string) (*toxiproxy.Proxy, error) {
+	// Alternatively, create the proxies manually with
+	// return toxiClient.CreateProxy("pgsql", "[::]:32777", "localhost:5432")
+	return toxiClient.CreateProxy("pgsql", listen, upstream)
+}
+
+// InjectLatency helper
+func InjectLatency(name string, delay int) *toxiproxy.Proxy {
+	proxy, err := toxiClient.Proxy(name)
+
 	if err != nil {
 		panic(err)
 	}
-	// Alternatively, create the proxies manually with
-	// toxiClient.CreateProxy("redis", "localhost:26379", "localhost:6379")
-}
 
-func InjectSlowness(name string, delay int32) *toxiproxy.Proxy {
-	proxies[name].AddToxic("", "latency", "", 1, toxiproxy.Attributes{
+	proxy.AddToxic("", "latency", "", 1, toxiproxy.Attributes{
 		"latency": delay,
 	})
 	// defer proxies[name].RemoveToxic("latency_downstream")
-	return proxies[name]
+	return proxy
 }

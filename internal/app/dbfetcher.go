@@ -5,11 +5,10 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/jackc/pgx"
-	"github.com/jackc/pgx/log/log15adapter"
-	_ "github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v4"
 )
 
+// City structure
 type City struct {
 	ID      int
 	Name    string
@@ -17,15 +16,15 @@ type City struct {
 	Mayor   string
 }
 
-func openDb,(ctx context.Context, dbConn string) (*pgx.Conn, func(context.Context) error, error) {
+func openDb(ctx context.Context, dbConn string) (*pgx.Conn, func(context.Context) error, error) {
 	config, err := pgx.ParseConfig(dbConn)
 	if err != nil {
 		return nil, nil, fmt.Errorf("Error with database connection string - %w", err)
 	}
 
-	config.Logger = log15adapter.NewLogger(log.New("dbfetcher", "pgx"))
+	// config.Logger = log15adapter.NewLogger(log.New(os.Stdout, "database: ", log.Ldate|log.Ltime|log.Lshortfile))
 
-	db, err := pgx.Connect(ctx, config)
+	db, err := pgx.ConnectConfig(ctx, config)
 
 	if err != nil {
 		log.Fatal(err)
@@ -36,7 +35,7 @@ func openDb,(ctx context.Context, dbConn string) (*pgx.Conn, func(context.Contex
 }
 
 // GetCities - from DB
-func GetCities(ctx context.Context, dbConn string, start int, count int) ([]City, error) {
+func GetCities(ctx context.Context, dbConn string, startId int, count int) ([]City, error) {
 	var cities []City
 
 	db, close, err := openDb(ctx, dbConn)
@@ -48,17 +47,27 @@ func GetCities(ctx context.Context, dbConn string, start int, count int) ([]City
 
 	defer close(ctx)
 
-	rows, err := db.Query("SELECT id, cityname, website, mayor FROM cities LIMIT $1", count)
+	var rows pgx.Rows
+
+	if startId > 0 {
+		rows, err = db.Query(ctx, `SELECT id, cityname, website, mayor FROM cities 
+				where id > $1 
+				order by id
+				LIMIT $2`, startId, count)
+	} else {
+		rows, err = db.Query(ctx, `SELECT id, cityname, website, mayor FROM cities 
+				 order by id LIMIT $1`, count)
+	}
 
 	if err != nil {
-		log.Println("Error while retrieving rows %v", err)
+		log.Printf("Error while retrieving rows %v\n", err)
 		return nil, fmt.Errorf("Error while retrieving rows %w", err)
 	}
 
 	for rows.Next() {
 		newCity := City{}
 
-		if err := rows.Scan(&City.Id, &City.Name, &City.Website, &City.Mayor); err != nil {
+		if err := rows.Scan(&newCity.ID, &newCity.Name, &newCity.Website, &newCity.Mayor); err != nil {
 			return nil, err
 		}
 		cities = append(cities, newCity)
