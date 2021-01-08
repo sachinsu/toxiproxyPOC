@@ -17,8 +17,8 @@ This is [Go](https://golang.org) lang project that demonstrates how to use [Toxi
         (Todo: for me to move these settings to configuration). Update `dbConnString` as well as ports in call to `AddPGProxy` as per your environment
 
   * Project consists of REST API that reads from PostgreSQL database. It has two end-points, 
-    * /api/cities - This end-point returns list of cities in JSON format but without any Toxics
-    * /api/cities/latency - This end-point returns list of cities in JSON format with induced latency. One can specify latency in miliseconds using `/api/cities/latency?delay=200` (default is 100).
+    * `/api/cities` - This end-point returns list of cities in JSON format but without any Toxics
+    * `/api/cities/latency` - This end-point returns list of cities in JSON format with induced latency. One can specify latency in miliseconds using `/api/cities/latency?delay=200` (default is 100).
     
  * Download Toxiproxy server for your OS from [here](https://toxiproxy.io).
  * Run the server
